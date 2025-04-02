@@ -382,6 +382,11 @@ Route::get('/init-db', function() {
     }
 });
 
-Route::get('/check-log', function () {
-    return response()->file(storage_path('logs/laravel.log'));
+Route::get('/db-check', function () {
+    try {
+        DB::connection()->getPdo();
+        return "✅ Database is connected: " . DB::connection()->getDatabaseName();
+    } catch (\Exception $e) {
+        return "❌ Database connection failed: " . $e->getMessage();
+    }
 });
