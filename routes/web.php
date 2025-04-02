@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 Route::get('/',function(){
@@ -354,15 +355,29 @@ Route::post('/admin/logout', function () {
 })->name('admin.logout');
 // Admin Dashboard For HR accounts
 
-
 Route::get('/init-db', function() {
     try {
-        Artisan::call('migrate:fresh', [
-            '--seed' => true,
+        // Test database connection first
+        DB::connection()->getPdo();
+        
+        // Run migrations
+        Artisan::call('migrate', ['--force' => true]);
+        
+        // Run seeders
+        Artisan::call('db:seed', [
+            '--class' => 'AdminSeeder',
             '--force' => true
         ]);
-        return "Database initialized successfully!";
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database initialized'
+        ]);
     } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTrace()
+        ], 500);
     }
 });
