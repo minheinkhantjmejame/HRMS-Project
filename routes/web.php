@@ -381,3 +381,7 @@ Route::get('/init-db', function() {
         ], 500);
     }
 });
+
+Route::get('/check-log', function () {
+    return file_get_contents(storage_path('logs/laravel.log'));
+});
