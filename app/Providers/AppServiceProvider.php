@@ -9,11 +9,17 @@ use PDO;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * Register any application services.
+     */
     public function register()
     {
         //
     }
 
+    /**
+     * Bootstrap any application services.
+     */
     public function boot()
     {
         // Force HTTPS in production
@@ -23,7 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
         // PostgreSQL SSL configuration
         if (env('DB_CONNECTION') === 'pgsql') {
-            DB::connection('pgsql')->setPdo(function ($pdo) {
+            DB::connection('pgsql')->setPdo(function () {
+                $pdo = DB::connection('pgsql')->getPdo();
                 $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
                 return $pdo;
             });
