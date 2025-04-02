@@ -16,7 +16,12 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-RUN apt-get install -y php-pgsql
+# Install PostgreSQL support
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo pdo_pgsql && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
