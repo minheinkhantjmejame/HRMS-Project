@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AuthController;
@@ -353,3 +353,16 @@ Route::post('/admin/logout', function () {
     return redirect('/admin/login'); // Redirect to the login page after logout
 })->name('admin.logout');
 // Admin Dashboard For HR accounts
+
+
+Route::get('/init-db', function() {
+    try {
+        Artisan::call('migrate:fresh', [
+            '--seed' => true,
+            '--force' => true
+        ]);
+        return "Database initialized successfully!";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
