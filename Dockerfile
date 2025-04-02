@@ -16,6 +16,8 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
+RUN apt-get install -y php-pgsql
+
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
