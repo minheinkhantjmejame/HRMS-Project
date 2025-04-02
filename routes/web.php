@@ -383,5 +383,5 @@ Route::get('/init-db', function() {
 });
 
 Route::get('/check-log', function () {
-    return file_get_contents(storage_path('logs/laravel.log'));
+    return response()->file(storage_path('logs/laravel.log'));
 });
