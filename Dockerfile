@@ -2,36 +2,35 @@ FROM php:8.2-apache
 
 WORKDIR /var/www/html
 
-# Install dependencies
+# 1. Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo pdo_pgsql
-COPY . .
-RUN chown -R www-data:www-data /var/www/html/storage
+# 2. Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd
 
-# Install Composer
+# 3. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy files (excluding .env)
+# 4. Copy application files
 COPY . .
 
-# Install dependencies
+# 5. Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install PostgreSQL support
-RUN apt-get update && \
-    apt-get install -y libpq-dev && \
-    docker-php-ext-install pdo pdo_pgsql && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set permissions
+# 6. Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
 
-# Apache config
+# 7. Apache configuration
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
 
